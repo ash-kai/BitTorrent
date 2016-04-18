@@ -11,7 +11,7 @@ import java.util.concurrent.Future;
  */
 
 
-public class Peer implements Runnable{
+public class Peer implements Runnable {
 
     private int id;
     private int idx;
@@ -28,7 +28,7 @@ public class Peer implements Runnable{
     private P2PLogger peerLog;
     private Configuration config;
 
-    public Peer(int id){
+    public Peer(int id) {
         config = new Configuration("Common.cfg", "PeerInfo.cfg");
 
         this.id = id;
@@ -46,25 +46,25 @@ public class Peer implements Runnable{
     }
 
     @Override
-    public void run(){
+    public void run() {
 
         System.out.println("Started running peer: " + id);
 
         List<String> hosts = config.getHostName();
         List<Integer> ports = config.getPortNumber();
         List<Integer> ids = config.getPeerID();
-        for(int i=0; i<N; i++) {
+        for (int i = 0; i < N; i++) {
             peerids[i] = ids.get(i);
-            if(peerids[i] == id){
+            if (peerids[i] == id) {
                 idx = i;
             }
         }
 
-        if(config.getHaveFile().get(idx)){
+        if (config.getHaveFile().get(idx)) {
             BitSet bitSet = new BitSet();
             bitSet.set(0, noOfPieces);
             bitfieldsMap.put(id, bitSet);
-        }else{
+        } else {
             bitfieldsMap.put(id, new BitSet());
         }
 
@@ -72,35 +72,35 @@ public class Peer implements Runnable{
 
         ExecutorService clientExecutorService = Executors.newFixedThreadPool(N);
         for (int i = 0; i < N; i++) {
-            if(i == idx) break;
-            try{
+            if (i == idx) break;
+            try {
                 Socket clientSocket = new Socket(hosts.get(i), ports.get(i));
                 System.out.println("connecting to server: " + hosts.get(i) + " port: " + ports.get(i));
                 clientExecutorService.submit(new ClientHandler(clientSocket, peerids[i]));
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
         clientExecutorService.shutdown();
 
         ExecutorService serverExecutorService = Executors.newFixedThreadPool(N);
-        try{
+        try {
             ServerSocket serverSocket = new ServerSocket(ports.get(idx));
             //client TCPs count
             int TCPcount = 0;
-            while(TCPcount < N - 1 - idx){  //@TODO change logic
+            while (TCPcount < N - 1 - idx) {  //@TODO change logic
                 serverExecutorService.submit(new ServerHandler(serverSocket.accept()));
                 TCPcount++;
                 System.out.println("server side TCP count: " + TCPcount);
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         serverExecutorService.shutdown();
         System.out.println("shutting down Peer services " + id);
     }
 
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
         Peer peer = new Peer(Integer.parseInt(args[0]));
         Thread peerThread = new Thread(peer);
         peerThread.start();
@@ -118,10 +118,10 @@ public class Peer implements Runnable{
         @Override
         public String call() {
             int status = server_communication();
-            try{
+            try {
                 System.out.println("SERVER: closing server socket at port " + socket.getLocalPort());
                 socket.close();
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             return "status: " + status;
@@ -141,28 +141,30 @@ public class Peer implements Runnable{
                 /*
                     1. Handshake receive from client
                  */
-                    Handshake handshake = new Handshake();
-                    handshake.handShakeReceived(socket);
-                    clientId = handshake.getPeerId();
-                    handshake.setPeerId(id);
-                    handshake.sendHandshakeMsg(socket);
-                    peerLog.logTcpConnected(clientId, Calendar.getInstance());
+                Handshake handshake = new Handshake();
+                handshake.handShakeReceived(socket);
+                clientId = handshake.getPeerId();
+                handshake.setPeerId(id);
+                handshake.sendHandshakeMsg(socket);
+                peerLog.logTcpConnected(clientId, Calendar.getInstance());
 
                 /*
                     2. receive bitfield from client
                  */
-                    Util util = new Util();
-                    Message msg = util.receiveMessage(in);
-                    if(msg.getType()==5) {
-                        System.out.println("SERVER: Received bitfied msg from client: " + clientId + " to server");
+                Util util = new Util();
+                Message msg = util.receiveMessage(in);
+                if (msg.getType() == 5) {
+                    System.out.println("SERVER: Received bitfied msg from client: " + clientId + " to server");
+                    if (msg.getPayload() != null) {
                         bitfieldsMap.put(clientId, BitSet.valueOf(msg.getPayload()));
-                        Message bitfiled_msg = new Message("bitfield");
-                        bitfiled_msg.setPayload(bitfieldsMap.get(id).toByteArray());
-                        System.out.println("SERVER: Sending bitfield msg from sever to client");
-                        util.sendMessage(out, bitfiled_msg);
-                    }else{
-                        System.out.println("SERVER: SHOULD NOT PRINT THIS");
                     }
+                    Message bitfiled_msg = new Message("bitfield");
+                    bitfiled_msg.setPayload(bitfieldsMap.get(id).toByteArray());
+                    System.out.println("SERVER: Sending bitfield msg from sever to client");
+                    util.sendMessage(out, bitfiled_msg);
+                } else {
+                    System.out.println("SERVER: SHOULD NOT PRINT THIS");
+                }
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -172,12 +174,12 @@ public class Peer implements Runnable{
         }
     }
 
-    class ClientHandler implements Callable<String>{
+    class ClientHandler implements Callable<String> {
 
         private Socket socket;
         private int serverId;
 
-        ClientHandler(Socket socket, int serverId){
+        ClientHandler(Socket socket, int serverId) {
             this.socket = socket;
             this.serverId = serverId;
         }
@@ -185,10 +187,10 @@ public class Peer implements Runnable{
         @Override
         public String call() {
             int status = client_communication();
-            try{
+            try {
                 System.out.println("CLIENT: closing client socket at port " + socket.getLocalPort());
                 socket.close();
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             return "status: " + status;
@@ -197,42 +199,45 @@ public class Peer implements Runnable{
         //return status
         // 1 - success
         // 0 - error
-        private int client_communication(){
+        private int client_communication() {
 
-            try(
+            try (
                     OutputStream out = socket.getOutputStream();
                     InputStream in = socket.getInputStream();
 
-            ){
+            ) {
                     /*
                         1. Handshake send to server
                      */
-                    Handshake handshake = new Handshake();
-                    handshake.setPeerId(id);
-                    handshake.sendHandshakeMsg(socket);
-                    handShakeMap.put(serverId, false);
-                    handshake.handShakeReceived(socket);
-                    System.out.println("CLIENT: Handshake initiation received from " + serverId);
-                    if (handShakeMap.get(serverId) != null) {
-                        handShakeMap.put(serverId, true);
-                        peerLog.logHandshakeSuccess(serverId, Calendar.getInstance());
-                        System.out.println("CLIENT: Handshake Success");
-                    }
-                    peerLog.logTcpConnection(serverId, Calendar.getInstance());
+                Handshake handshake = new Handshake();
+                handshake.setPeerId(id);
+                handshake.sendHandshakeMsg(socket);
+                handShakeMap.put(serverId, false);
+                handshake.handShakeReceived(socket);
+                System.out.println("CLIENT: Handshake initiation received from " + serverId);
+                if (handShakeMap.get(serverId) != null) {
+                    handShakeMap.put(serverId, true);
+                    peerLog.logHandshakeSuccess(serverId, Calendar.getInstance());
+                    System.out.println("CLIENT: Handshake Success");
+                }
+                peerLog.logTcpConnection(serverId, Calendar.getInstance());
 
                     /*
                         2. bitfield send to server
                      */
-                    Util util = new Util();
-                    Message bitfieldMsg = new Message("bitfield");
-                    bitfieldMsg.setPayload(bitfieldsMap.get(id).toByteArray());
+                Util util = new Util();
+                Message bitfieldMsg = new Message("bitfield");
+                bitfieldMsg.setPayload(bitfieldsMap.get(id).toByteArray());
 
-                    System.out.println("CLIENT: Sending bitfied msg from client: " + id + " to server: " + serverId);
-                    util.sendMessage(out, bitfieldMsg);
+                System.out.println("CLIENT: Sending bitfied msg from client: " + id + " to server: " + serverId);
+                util.sendMessage(out, bitfieldMsg);
 
+                Message msg = util.receiveMessage(in);
+                if(msg.getType()==5){
+                    System.out.println("CLIENT: we can close now!!");
+                }
 
-
-            }catch(Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
                 return 0;
             }

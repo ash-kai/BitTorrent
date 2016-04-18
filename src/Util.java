@@ -16,9 +16,9 @@ public class Util {
             msg.setLength(msg.getPayload().length + 1);
         }
         out.write(intToByteArray(msg.getLength()));
+        System.out.println("in sendMessage: len of msg type: " + msg.getType());
         out.write(msg.getType());
 
-        System.out.println("in sendMessage: len of msg type: " + msg.getType());
 
         if (msg.getPayload() != null) {
             out.write(msg.getPayload());
@@ -28,24 +28,38 @@ public class Util {
 
     public Message receiveMessage(InputStream in) throws IOException {
         Message msg = new Message(null);
-        byte[] lengthInByte = new byte[4];
+
         int totalRead = 0, received = 0;
 
         //Read the length section of message
-        received = in.read(lengthInByte, 0, 4);
-        totalRead += received;
+        byte[] lengthInByte = new byte[4];
+        while (totalRead < 4) {
+            received = in.read(lengthInByte, totalRead, 4 - totalRead);
+            totalRead += received;
+        }
         msg.setLength(byteToIntArray(lengthInByte));
 
         //Read the type section of message
+        totalRead = 0;
         byte[] mType = new byte[1];
         System.out.println("len: " + byteToIntArray(lengthInByte) + " totalRead: " + totalRead);
-        received = in.read(mType, totalRead, 1);
+        while (totalRead < 1) {
+            received = in.read(mType, totalRead, 1 - totalRead);
+            totalRead += received;
+        }
         msg.setType(mType[0]);
-        totalRead += received;
-
         //Read the remaining payload
-        byte[] mPayload = new byte[msg.getLength() - 1];
-        received = in.read(mPayload, totalRead, msg.getLength() - 1);
+        byte[] mPayload;
+        if (msg.getLength() > 1) {
+            mPayload = new byte[msg.getLength() - 1];
+        } else {
+            mPayload = null;
+        }
+        totalRead = 0;
+        while (totalRead < msg.getLength() - 1) {
+            received = in.read(mPayload, totalRead, msg.getLength() - 1 - totalRead);
+            totalRead += received;
+        }
         msg.setPayload(mPayload);
         return msg;
     }
