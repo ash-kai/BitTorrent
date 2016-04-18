@@ -51,6 +51,7 @@ public class Peer implements Runnable{
                 Socket clientSocket = new Socket(config.getHostName().get(i), config.getPortNumber().get(i));
                 Calendar cal = Calendar.getInstance();
                 this.peerLog.logTcpConnection(config.getPeerID().get(i), cal);
+//                System.out.println(clientSocket.)
 
                 //Send Handshake messages
                 Handshake handshakeFrmClient = new Handshake();
