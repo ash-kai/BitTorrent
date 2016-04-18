@@ -22,7 +22,8 @@ public class P2PLogger {
             this.id = peerID;
             dateFormatter = new SimpleDateFormat("HH:mm:ss");
             logger = Logger.getLogger("peerLogger_" + peerID);
-            handler = new FileHandler("log_peer_" + peerID + ".log");
+            String pathname = "peer_" + id + "/";
+            handler = new FileHandler(pathname + "log_peer_" + peerID + ".log");
             SimpleFormatter format = new SimpleFormatter();
             handler.setFormatter(format);
             logger.addHandler(handler);
