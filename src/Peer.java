@@ -125,7 +125,12 @@ public class Peer implements Runnable {
 
         clientExecutorService.shutdown();
         serverExecutorService.shutdown();
-        //closeAll();
+        try{
+            Thread.sleep(5000);
+            closeAll();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
         System.out.println("shutting down Peer services " + id);
     }
 
@@ -149,7 +154,7 @@ public class Peer implements Runnable {
             int status = server_communication();
             try {
                 System.out.println("SERVER: closing server socket at port " + socket.getLocalPort());
-                socket.close(); //@TODO check
+                //socket.close(); //@TODO check
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -161,10 +166,10 @@ public class Peer implements Runnable {
         // 0 - error
         private int server_communication() {
 
-            try(OutputStream out = socket.getOutputStream();
-                InputStream in = socket.getInputStream();
-            )
+            try
             {
+                OutputStream out = socket.getOutputStream();
+                InputStream in = socket.getInputStream();
 
                 /*
                     1. Handshake receive from client
@@ -249,7 +254,7 @@ public class Peer implements Runnable {
             int status = client_communication();
             try {
                 System.out.println("CLIENT: " + id + " closing client socket at port " + socket.getLocalPort());
-                socket.close(); //@TODO check
+                //socket.close(); //@TODO check
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -261,9 +266,10 @@ public class Peer implements Runnable {
         // 0 - error
         private int client_communication() {
 
-            try(OutputStream out = socket.getOutputStream();
+            try
+            {
+                OutputStream out = socket.getOutputStream();
                 InputStream in = socket.getInputStream();
-            ){
 
                 /*
                     1. Handshake send to server
