@@ -64,19 +64,9 @@ public class Peer implements Runnable {
         List<String> hosts = config.getHostName();
         List<Integer> ports = config.getPortNumber();
         List<Integer> ids = config.getPeerID();
-        List<Boolean> haveFile = config.getHaveFile();
         for (int i = 0; i < N; i++) {
             peerids[i] = ids.get(i);
             if (peerids[i] == id) {
-                if (haveFile.get(i)) {
-                    try {
-                        File sourceFile = new File("TheFile.txt");
-                        fileHandle.CopyFile(sourceFile);
-                    } catch (IOException ex) {
-                        System.out.println("Error: Reading Source File");
-                        System.out.println(ex.getMessage());
-                    }
-                }
                 idx = i;
             }
         }
@@ -85,6 +75,13 @@ public class Peer implements Runnable {
             BitSet bitSet = new BitSet();
             bitSet.set(0, noOfPieces);
             bitfieldsMap.put(id, bitSet);
+            try {
+                File sourceFile = new File("TheFile.txt");
+                fileHandle.CopyFile(sourceFile);
+            } catch (IOException ex) {
+                System.out.println("Error: Reading Source File");
+                System.out.println(ex.getMessage());
+            }
         } else {
             bitfieldsMap.put(id, new BitSet());
         }
