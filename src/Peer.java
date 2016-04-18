@@ -76,7 +76,7 @@ public class Peer implements Runnable {
             bitSet.set(0, noOfPieces);
             bitfieldsMap.put(id, bitSet);
             try {
-                File sourceFile = new File("TheFile.txt");
+                File sourceFile = new File(config.getFileName());
                 fileHandle.CopyFile(sourceFile);
             } catch (IOException ex) {
                 System.out.println("Error: Reading Source File");
