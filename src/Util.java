@@ -100,10 +100,10 @@ public class Util {
             if(!me.get(i))
                 interestingIndices.add(i);
         }
-        System.out.println("inside getInterestingIndices");
-        System.out.println("me: " + me);
-        System.out.println("other: " + other);
-        System.out.println("interestingIndices_size: " + interestingIndices.size());
+//        System.out.println("inside getInterestingIndices");
+//        System.out.println("me: " + me);
+//        System.out.println("other: " + other);
+//        System.out.println("interestingIndices_size: " + interestingIndices.size());
         return interestingIndices;
     }
 }
