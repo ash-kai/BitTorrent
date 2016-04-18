@@ -8,7 +8,7 @@ import java.util.ResourceBundle;
  */
 public class Util {
 
-    public void sendMessagePacket(OutputStream out, Message msg) throws IOException {
+    public void sendMessage(OutputStream out, Message msg) throws IOException {
 
         if (msg.getPayload() == null) {
             msg.setLength(1);
@@ -18,14 +18,16 @@ public class Util {
         out.write(intToByteArray(msg.getLength()));
         out.write(msg.getType());
 
+        System.out.println("in sendMessage: len of msg type: " + msg.getType());
+
         if (msg.getPayload() != null) {
-            out.write(msg.getType());
+            out.write(msg.getPayload());
         }
         out.flush();
     }
 
-    public Message ReceiveMessagePacket(InputStream in) throws IOException {
-        Message msg = new Message();
+    public Message receiveMessage(InputStream in) throws IOException {
+        Message msg = new Message(null);
         byte[] lengthInByte = new byte[4];
         int totalRead = 0, received = 0;
 
@@ -36,6 +38,7 @@ public class Util {
 
         //Read the type section of message
         byte[] mType = new byte[1];
+        System.out.println("len: " + byteToIntArray(lengthInByte) + " totalRead: " + totalRead);
         received = in.read(mType, totalRead, 1);
         msg.setType(mType[0]);
         totalRead += received;
@@ -57,14 +60,14 @@ public class Util {
     }
 
     public static int byteToIntArray(byte[] value) {
-        int result = 0;
-        for (int i = 0; i < 4; i++) {
-            result = (result << 8) - Byte.MIN_VALUE + (int) value[i];
-        }
-//        int val = (value[0] << 24) & 0xFF000000 |
-//                (value[1] << 16) & 0x00FF0000 |
-//                (value[2] << 8) & 0x0000FF00 |
-//                (value[3] << 0) & 0x000000FF;
+//        int result = 0;
+//        for (int i = 0; i < 4; i++) {
+//            result = (result << 8) - Byte.MIN_VALUE + (int) value[i];
+//        }
+        int result = (value[0] << 24) & 0xFF000000 |
+                (value[1] << 16) & 0x00FF0000 |
+                (value[2] << 8) & 0x0000FF00 |
+                (value[3] << 0) & 0x000000FF;
         return result;
     }
 }

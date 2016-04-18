@@ -8,6 +8,11 @@ import java.io.OutputStream;
  */
 public class Message {
 
+    Message(String type){
+        if(type!=null)
+            setMessageType(type);
+    }
+
     //Length
     private int length;
 
@@ -39,6 +44,11 @@ public class Message {
 
     public void setPayload(byte[] payload) {
         this.payload = payload;
+        if(payload != null && payload.length > 0){
+            setLength(this.payload.length + 1);
+        }else{
+            setLength(1);
+        }
     }
 
     public void setMessageType(String type) {

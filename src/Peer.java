@@ -76,7 +76,7 @@ public class Peer implements Runnable{
             try{
                 Socket clientSocket = new Socket(hosts.get(i), ports.get(i));
                 System.out.println("connecting to server: " + hosts.get(i) + " port: " + ports.get(i));
-                clientExecutorService.submit(new ClientHandler(clientSocket, id));
+                clientExecutorService.submit(new ClientHandler(clientSocket, peerids[i]));
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -119,7 +119,7 @@ public class Peer implements Runnable{
         public String call() {
             int status = server_communication();
             try{
-                System.out.println("closing server socket at port " + socket.getLocalPort());
+                System.out.println("SERVER: closing server socket at port " + socket.getLocalPort());
                 socket.close();
             }catch (Exception e){
                 e.printStackTrace();
@@ -148,6 +148,22 @@ public class Peer implements Runnable{
                     handshake.sendHandshakeMsg(socket);
                     peerLog.logTcpConnected(clientId, Calendar.getInstance());
 
+                /*
+                    2. receive bitfield from client
+                 */
+                    Util util = new Util();
+                    Message msg = util.receiveMessage(in);
+                    if(msg.getType()==5) {
+                        System.out.println("SERVER: Received bitfied msg from client: " + clientId + " to server");
+                        bitfieldsMap.put(clientId, BitSet.valueOf(msg.getPayload()));
+                        Message bitfiled_msg = new Message("bitfield");
+                        bitfiled_msg.setPayload(bitfieldsMap.get(id).toByteArray());
+                        System.out.println("SERVER: Sending bitfield msg from sever to client");
+                        util.sendMessage(out, bitfiled_msg);
+                    }else{
+                        System.out.println("SERVER: SHOULD NOT PRINT THIS");
+                    }
+
             } catch (Exception e) {
                 e.printStackTrace();
                 return 0;
@@ -170,7 +186,7 @@ public class Peer implements Runnable{
         public String call() {
             int status = client_communication();
             try{
-                System.out.println("closing client socket at port " + socket.getLocalPort());
+                System.out.println("CLIENT: closing client socket at port " + socket.getLocalPort());
                 socket.close();
             }catch (Exception e){
                 e.printStackTrace();
@@ -196,17 +212,25 @@ public class Peer implements Runnable{
                     handshake.sendHandshakeMsg(socket);
                     handShakeMap.put(serverId, false);
                     handshake.handShakeReceived(socket);
-                    System.out.println("Handshake initiation received from " + serverId);
+                    System.out.println("CLIENT: Handshake initiation received from " + serverId);
                     if (handShakeMap.get(serverId) != null) {
                         handShakeMap.put(serverId, true);
                         peerLog.logHandshakeSuccess(serverId, Calendar.getInstance());
-                        System.out.println("Handshake Success");
+                        System.out.println("CLIENT: Handshake Success");
                     }
                     peerLog.logTcpConnection(serverId, Calendar.getInstance());
 
                     /*
                         2. bitfield send to server
                      */
+                    Util util = new Util();
+                    Message bitfieldMsg = new Message("bitfield");
+                    bitfieldMsg.setPayload(bitfieldsMap.get(id).toByteArray());
+
+                    System.out.println("CLIENT: Sending bitfied msg from client: " + id + " to server: " + serverId);
+                    util.sendMessage(out, bitfieldMsg);
+
+
 
             }catch(Exception e){
                 e.printStackTrace();
