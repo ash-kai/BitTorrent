@@ -28,6 +28,11 @@ public class Peer implements Runnable {
     private P2PLogger peerLog;
     private Configuration config;
 
+    private Set<Integer> interestedPeers;
+    private Set<Integer> unchokedPeers;
+    private Set<Integer> chokedPeers;
+    private int optPeer;
+
     public Peer(int id) {
         config = new Configuration("Common.cfg", "PeerInfo.cfg");
 
@@ -43,6 +48,10 @@ public class Peer implements Runnable {
         handShakeMap = new HashMap<>();
 
         peerLog = new P2PLogger(this.id);
+
+        interestedPeers = new HashSet<>();
+        unchokedPeers   = new HashSet<>();
+        chokedPeers     = new HashSet<>();
     }
 
     @Override
@@ -153,19 +162,34 @@ public class Peer implements Runnable {
                  */
                 Util util = new Util();
                 Message msg = util.receiveMessage(in);
-                if (msg.getType() == 5) {
-                    System.out.println("SERVER: Received bitfied msg from client: " + clientId + " to server");
-                    if (msg.getPayload() != null) {
-                        bitfieldsMap.put(clientId, BitSet.valueOf(msg.getPayload()));
-                    }
-                    Message bitfiled_msg = new Message("bitfield");
-                    bitfiled_msg.setPayload(bitfieldsMap.get(id).toByteArray());
-                    System.out.println("SERVER: Sending bitfield msg from sever to client");
-                    util.sendMessage(out, bitfiled_msg);
-                } else {
-                    System.out.println("SERVER: SHOULD NOT PRINT THIS");
-                }
+                bitfieldsMap.put(clientId, new BitSet());
 
+                // Server: keep listening to messages until client gets the full file
+                while(bitfieldsMap.get(clientId).cardinality()!=noOfPieces){
+
+                    switch (msg.getType()){
+
+
+                        case(2): //interested
+                            System.out.println("SERVER: Received interested msg from client: " + clientId + " to server");
+                            System.out.println("SERVER: Start sending piece!! " + Util.byteToIntArray(msg.getPayload()));
+                            break;
+
+                        case(5): //bitfield
+                            System.out.println("SERVER: Received bitfied msg from client: " + clientId + " to server");
+                            if (msg.getPayload() != null) {
+                                bitfieldsMap.put(clientId, BitSet.valueOf(msg.getPayload()));
+                            }
+                            Message bitfiled_msg = new Message("bitfield");
+                            bitfiled_msg.setPayload(bitfieldsMap.get(id).toByteArray());
+                            System.out.println("SERVER: Sending bitfield msg from sever to client");
+                            util.sendMessage(out, bitfiled_msg);
+                            break;
+
+                    }
+
+                    msg = util.receiveMessage(in);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 return 0;
@@ -209,33 +233,64 @@ public class Peer implements Runnable {
                     /*
                         1. Handshake send to server
                      */
-                Handshake handshake = new Handshake();
-                handshake.setPeerId(id);
-                handshake.sendHandshakeMsg(socket);
-                handShakeMap.put(serverId, false);
-                handshake.handShakeReceived(socket);
-                System.out.println("CLIENT: Handshake initiation received from " + serverId);
-                if (handShakeMap.get(serverId) != null) {
-                    handShakeMap.put(serverId, true);
-                    peerLog.logHandshakeSuccess(serverId, Calendar.getInstance());
-                    System.out.println("CLIENT: Handshake Success");
-                }
-                peerLog.logTcpConnection(serverId, Calendar.getInstance());
+                    Handshake handshake = new Handshake();
+                    handshake.setPeerId(id);
+                    handshake.sendHandshakeMsg(socket);
+                    handShakeMap.put(serverId, false);
+                    handshake.handShakeReceived(socket);
+                    System.out.println("CLIENT: Handshake initiation received from " + serverId);
+                    if (handShakeMap.get(serverId) != null) {
+                        handShakeMap.put(serverId, true);
+                        peerLog.logHandshakeSuccess(serverId, Calendar.getInstance());
+                        System.out.println("CLIENT: Handshake Success");
+                    }
+                    peerLog.logTcpConnection(serverId, Calendar.getInstance());
 
                     /*
                         2. bitfield send to server
                      */
-                Util util = new Util();
-                Message bitfieldMsg = new Message("bitfield");
-                bitfieldMsg.setPayload(bitfieldsMap.get(id).toByteArray());
+                    Util util = new Util();
+                    Message bitfieldMsg = new Message("bitfield");
+                    bitfieldMsg.setPayload(bitfieldsMap.get(id).toByteArray());
+                    System.out.println("CLIENT: Sending bitfied msg from client: " + id + " to server: " + serverId);
+                    util.sendMessage(out, bitfieldMsg);
 
-                System.out.println("CLIENT: Sending bitfied msg from client: " + id + " to server: " + serverId);
-                util.sendMessage(out, bitfieldMsg);
+                    Message msg = util.receiveMessage(in);
 
-                Message msg = util.receiveMessage(in);
-                if(msg.getType()==5){
-                    System.out.println("CLIENT: we can close now!!");
-                }
+                    //Client: keep sending messages until we receive the full file
+                    while(bitfieldsMap.get(id).cardinality()!=noOfPieces){
+
+                        switch (msg.getType()){
+
+                            case(4): //have
+
+                                    break;
+                            case(5): //bitfield
+                                    System.out.println("CLIENT: received bitfield msg!!");
+                                    boolean interested = false;
+                                    if(msg.getPayload()!=null){
+                                        bitfieldsMap.put(serverId, BitSet.valueOf(msg.getPayload()));
+                                        int rndPieceNumber = util.getRandomInterestingPiece(bitfieldsMap.get(id), bitfieldsMap.get(serverId));
+                                        if(rndPieceNumber != -1){
+                                            Message interested_msg = new Message("interested");
+                                            interested_msg.setPayload(Util.intToByteArray(rndPieceNumber));
+                                            System.out.println("CLIENT: Sending interested in pieceNumber: " + rndPieceNumber + " from client: " + id + " to server: " + serverId);
+                                            interested = true;
+                                            util.sendMessage(out, interested_msg);
+                                        }
+                                    }
+                                    if(!interested){
+                                        Message notinterested_msg = new Message("not interested");
+                                        util.sendMessage(out, notinterested_msg);
+                                    }
+                                    break;
+
+                        }
+
+                        msg = util.receiveMessage(in);
+
+                    }
+
 
             } catch (Exception e) {
                 e.printStackTrace();

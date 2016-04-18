@@ -1,7 +1,7 @@
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ResourceBundle;
+import java.util.*;
 
 /**
  * Created by Ash on 4/17/16.
@@ -83,5 +83,27 @@ public class Util {
                 (value[2] << 8) & 0x0000FF00 |
                 (value[3] << 0) & 0x000000FF;
         return result;
+    }
+
+    public int getRandomInterestingPiece(BitSet me, BitSet other){
+        List<Integer> interestingIndices = getInterestingIndices(me, other);
+        if(interestingIndices.size() == 0) return -1;
+        Random random = new Random();
+        int rnd = random.nextInt(interestingIndices.size());
+        System.out.println("rnd: " + rnd);
+        return interestingIndices.get(rnd);
+    }
+
+    public List<Integer> getInterestingIndices(BitSet me, BitSet other){
+        List<Integer> interestingIndices = new ArrayList<Integer>();
+        for (int i = other.nextSetBit(0); i != -1; i = other.nextSetBit(i + 1)) {
+            if(!me.get(i))
+                interestingIndices.add(i);
+        }
+        System.out.println("inside getInterestingIndices");
+        System.out.println("me: " + me);
+        System.out.println("other: " + other);
+        System.out.println("interestingIndices_size: " + interestingIndices.size());
+        return interestingIndices;
     }
 }
