@@ -239,6 +239,14 @@ public class Peer implements Runnable {
                     interestedPeers.add(clientId);
                     peerLog.logInterested(clientId, Calendar.getInstance());
                     System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "SERVER: " + id + " received interested from " + clientId + " piece: " + Util.byteToIntArray(msg.getPayload()));
+
+                    //trial to send chunk
+                    byte[] tempData = fileHandle.readFromFile(Util.byteToIntArray(msg.getPayload()));
+                    Message temp = new Message("piece");
+                    temp.setPayload(tempData);
+                    util.sendMessage(out, temp);
+                    System.out.println("The data chunk send to the client: " + clientId);
+
                 } else if (msg.getType() == 3) { //not interested
                     if (interestedPeers.contains(clientId))
                         interestedPeers.remove(clientId);
@@ -324,8 +332,13 @@ public class Peer implements Runnable {
                         if (rndPieceNumber != -1) {
                             Message interested_msg = new Message("interested");
                             interested_msg.setPayload(Util.intToByteArray(rndPieceNumber));
+//                          interested_msg.setPayload(Util.intToByteArray(0));
                             System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "CLIENT: " + id + " sending interested in pieceNumber: " + rndPieceNumber + " to server: " + serverId);
                             util.sendMessage(out, interested_msg);
+                            System.out.println("Receiving from Server the chunk");
+                            Message temp = util.receiveMessage(in);
+                            fileHandle.writeToFile(temp.getPayload(), rndPieceNumber);
+                            System.out.println("Piece written to file");
                             interested = true;
                         }
                     }
@@ -342,7 +355,7 @@ public class Peer implements Runnable {
                 } else if (msg.getType() == 3) { //not interested
                     if (interestedPeers.contains(serverId))
                         interestedPeers.remove(serverId);
-                    peerLog.logNotInterested(serverId,Calendar.getInstance());
+                    peerLog.logNotInterested(serverId, Calendar.getInstance());
                     System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "CLIENT: " + id + " received not interested from " + serverId);
                 } else {
                     //should not happen
