@@ -86,10 +86,19 @@ public class Util {
     }
 
     public int getRandomInterestingPiece(BitSet me, BitSet other){
+        return getRandomInterestingPieceNotIn(me, other, new HashSet<>());
+    }
+
+    public int getRandomInterestingPieceNotIn(BitSet me, BitSet other, Set<Integer> requested){
         List<Integer> interestingIndices = getInterestingIndices(me, other);
         if(interestingIndices.size() == 0) return -1;
         Random random = new Random();
-        int rnd = random.nextInt(interestingIndices.size());
+        int rnd = -1;
+        while(true){
+            rnd = random.nextInt(interestingIndices.size());
+            if(!requested.contains(rnd))
+                break;
+        }
         System.out.println("rnd: " + rnd);
         return interestingIndices.get(rnd);
     }
