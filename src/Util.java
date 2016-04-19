@@ -8,7 +8,7 @@ import java.util.*;
  */
 public class Util {
 
-    public void sendMessage(OutputStream out, Message msg) throws IOException {
+    public synchronized void sendMessage(OutputStream out, Message msg) throws IOException {
 
         if (msg.getPayload() == null) {
             msg.setLength(1);
@@ -26,7 +26,7 @@ public class Util {
         out.flush();
     }
 
-    public Message receiveMessage(InputStream in) throws IOException {
+    public synchronized Message receiveMessage(InputStream in) throws IOException {
         Message msg = new Message(null);
 
         int totalRead = 0, received = 0;
@@ -42,6 +42,10 @@ public class Util {
         //Read the type section of message
         totalRead = 0;
         byte[] mType = new byte[1];
+        int len = byteToIntArray(lengthInByte);
+        if(len > 300){
+            System.out.println("ERROR IN LENGTH len: " + len); //TODO debug this!!
+        }
         System.out.println("len: " + byteToIntArray(lengthInByte) + " totalRead: " + totalRead);
         while (totalRead < 1) {
             received = in.read(mType, totalRead, 1 - totalRead);
