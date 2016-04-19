@@ -1,0 +1,139 @@
+MLA In-Text Citations: The Basics
+Summary:
+MLA (Modern Language Association) style is most commonly used to write papers and cite sources within the liberal arts and humanities. This resource, updated to reflect the MLA Handbook for Writers of Research Papers (7th ed.) and the MLA Style Manual and Guide to Scholarly Publishing (3rd ed.), offers examples for the general format of MLA research papers, in-text citations, endnotes/footnotes, and the Works Cited page. Note: MLA has recently released the eighth edition of its handbook. See our page on the major changes in the new edition. We will replace our current MLA resources with resources on the eighth edition in early June 2016.
+Contributors:Tony Russell, Allen Brizee, Elizabeth Angeli, Russell Keck, Joshua M. Paiz, Michelle Campbell, Rodrigo Rodríguez-Fuentes, Daniel P. Kenzie, Susan Wegener, Purdue OWL Staff
+Last Edited: 2014-03-06 11:05:00
+Guidelines for referring to the works of others in your text using MLA style are covered in chapter 6 of the MLA Handbook and in chapter 7 of the MLA Style Manual. Both books provide extensive examples, so it's a good idea to consult them if you want to become even more familiar with MLA guidelines or if you have a particular reference question.
+
+Basic in-text citation rules
+
+In MLA style, referring to the works of others in your text is done by using what is known as parenthetical citation. This method involves placing relevant source information in parentheses after a quote or a paraphrase.
+
+General Guidelines
+
+The source information required in a parenthetical citation depends (1.) upon the source medium (e.g. Print, Web, DVD) and (2.) upon the source’s entry on the Works Cited (bibliography) page.
+Any source information that you provide in-text must correspond to the source information on the Works Cited page. More specifically, whatever signal word or phrase you provide to your readers in the text, must be the first thing that appears on the left-hand margin of the corresponding entry in the Works Cited List.
+In-text citations: Author-page style
+
+MLA format follows the author-page method of in-text citation. This means that the author's last name and the page number(s) from which the quotation or paraphrase is taken must appear in the text, and a complete reference should appear on your Works Cited page. The author's name may appear either in the sentence itself or in parentheses following the quotation or paraphrase, but the page number(s) should always appear in the parentheses, not in the text of your sentence. For example:
+
+Wordsworth stated that Romantic poetry was marked by a "spontaneous overflow of powerful feelings" (263). 
+
+Romantic poetry is characterized by the "spontaneous overflow of powerful feelings" (Wordsworth 263).
+Wordsworth extensively explored the role of emotion in the creative process (263).
+Both citations in the examples above, (263) and (Wordsworth 263), tell readers that the information in the sentence can be located on page 263 of a work by an author named Wordsworth. If readers want more information about this source, they can turn to the Works Cited page, where, under the name of Wordsworth, they would find the following information:
+
+Wordsworth, William. Lyrical Ballads. London: Oxford UP, 1967. Print.
+In-text citations for print sources with known author
+
+For Print sources like books, magazines, scholarly journal articles, and newspapers, provide a signal word or phrase (usually the author’s last name) and a page number. If you provide the signal word/phrase in the sentence, you do not need to include it in the parenthetical citation.
+
+Human beings have been described by Kenneth Burke as "symbol-using animals" (3).
+Human beings have been described as "symbol-using animals" (Burke 3).
+These examples must correspond to an entry that begins with Burke, which will be the first thing that appears on the left-hand margin of an entry in the Works Cited:
+
+Burke, Kenneth. Language as Symbolic Action: Essays on Life, Literature, and Method. Berkeley: U of California P, 1966. Print.
+In-text citations for print sources by a corporate author
+
+When a source has a corporate author, it is acceptable to use the name of the corporation followed by the page number for the in-text citation. You should also use abbreviations (e.g., nat'l for national) where appropriate, so as to avoid interrupting the flow of reading with overly long parenthetical citations.
+
+In-text citations for print sources with no known author
+
+When a source has no known author, use a shortened title of the work instead of an author name. Place the title in quotation marks if it's a short work (such as an article) or italicize it if it's a longer work (e.g. plays, books, television shows, entire Web sites) and provide a page number.
+
+We see so many global warming hotspots in North America likely because this region has "more readily accessible climatic data and more comprehensive programs to monitor and study environmental change . . ." ("Impact of Global Warming" 6).
+In this example, since the reader does not know the author of the article, an abbreviated title of the article appears in the parenthetical citation which corresponds to the full name of the article which appears first at the left-hand margin of its respective entry in the Works Cited. Thus, the writer includes the title in quotation marks as the signal phrase in the parenthetical citation in order to lead the reader directly to the source on the Works Cited page. The Works Cited entry appears as follows:
+
+"The Impact of Global Warming in North America." Global Warming: Early Signs. 1999. Web. 23 Mar. 2009.
+We'll learn how to make a Works Cited page in a bit, but right now it's important to know that parenthetical citations and Works Cited pages allow readers to know which sources you consulted in writing your essay, so that they can either verify your interpretation of the sources or use them in their own scholarly work.
+
+Author-page citation for classic and literary works with multiple editions
+
+Page numbers are always required, but additional citation information can help literary scholars, who may have a different edition of a classic work like Marx and Engels's The Communist Manifesto. In such cases, give the page number of your edition (making sure the edition is listed in your Works Cited page, of course) followed by a semicolon, and then the appropriate abbreviations for volume (vol.), book (bk.), part (pt.), chapter (ch.), section (sec.), or paragraph (par.). For example:
+
+Marx and Engels described human history as marked by class struggles (79; ch. 1).
+Citing authors with same last names
+
+Sometimes more information is necessary to identify the source from which a quotation is taken. For instance, if two or more authors have the same last name, provide both authors' first initials (or even the authors' full name if different authors share initials) in your citation. For example:
+
+Although some medical ethicists claim that cloning will lead to designer children (R. Miller 12), others note that the advantages for medical research outweigh this consideration (A. Miller 46).
+Citing a work by multiple authors
+
+For a source with three or fewer authors, list the authors' last names in the text or in the parenthetical citation:
+
+Smith, Yang, and Moore argue that tougher gun control is not needed in the United States (76).
+The authors state "Tighter gun control in the United States erodes Second Amendment rights" (Smith, Yang, and Moore 76).
+For a source with more than three authors, use the work's bibliographic information as a guide for your citation. Provide the first author's last name followed by et al. or list all the last names.
+
+Jones et al. counter Smith, Yang, and Moore's argument by noting that the current spike in gun violence in America compels law makers to adjust gun laws (4).
+Or
+
+Legal experts counter Smith, Yang, and Moore's argument by noting that the current spike in gun violence in America compels law makers to adjust gun laws (Jones et al. 4).
+Or
+
+Jones, Driscoll, Ackerson, and Bell counter Smith, Yang, and Moore's argument by noting that the current spike in gun violence in America compels law makers to adjust gun laws (4).
+Citing multiple works by the same author
+
+If you cite more than one work by a particular author, include a shortened title for the particular work from which you are quoting to distinguish it from the others. Put short titles of books in italics and short titles of articles in quotation marks.
+
+Citing two articles by the same author:
+
+Lightenor has argued that computers are not useful tools for small children ("Too Soon" 38), though he has acknowledged elsewhere that early exposure to computer games does lead to better small motor skill development in a child's second and third year ("Hand-Eye Development" 17).
+Citing two books by the same author:
+
+Murray states that writing is "a process" that "varies with our thinking style" (Write to Learn 6). Additionally, Murray argues that the purpose of writing is to "carry ideas and information from the mind of one person into the mind of another" (A Writer Teaches Writing 3).
+Additionally, if the author's name is not mentioned in the sentence, you would format your citation with the author's name followed by a comma, followed by a shortened title of the work, followed, when appropriate, by page numbers:
+
+Visual studies, because it is such a new discipline, may be "too easy" (Elkins, "Visual Studies" 63).
+Citing multivolume works
+
+If you cite from different volumes of a multivolume work, always include the volume number followed by a colon. Put a space after the colon, then provide the page number(s). (If you only cite from one volume, provide only the page number in parentheses.)
+
+. . . as Quintilian wrote in Institutio Oratoria (1: 14-17).
+Citing the Bible
+
+In your first parenthetical citation, you want to make clear which Bible you're using (and underline or italicize the title), as each version varies in its translation, followed by book (do not italicize or underline), chapter and verse. For example:
+
+Ezekiel saw "what seemed to be four living creatures," each with faces of a man, a lion, an ox, and an eagle (New Jerusalem Bible, Ezek. 1.5-10).
+If future references employ the same edition of the Bible you’re using, list only the book, chapter, and verse in the parenthetical citation.
+
+Citing indirect sources
+
+Sometimes you may have to use an indirect source. An indirect source is a source cited in another source. For such indirect quotations, use "qtd. in" to indicate the source you actually consulted. For example:
+
+Ravitch argues that high schools are pressured to act as "social service centers, and they don't do that well" (qtd. in Weisman 259).
+Note that, in most cases, a responsible researcher will attempt to find the original source, rather than citing an indirect source.
+
+Citing non-print or sources from the Internet
+
+With more and more scholarly work being posted on the Internet, you may have to cite research you have completed in virtual environments. While many sources on the Internet should not be used for scholarly work (reference the OWL's Evaluating Sources of Information resource), some Web sources are perfectly acceptable for research. When creating in-text citations for electronic, film, or Internet sources, remember that your citation must reference the source in your Works Cited.
+
+Sometimes writers are confused with how to craft parenthetical citations for electronic sources because of the absence of page numbers, but often, these sorts of entries do not require any sort of parenthetical citation at all. For electronic and Internet sources, follow the following guidelines:
+
+Include in the text the first item that appears in the Work Cited entry that corresponds to the citation (e.g. author name, article name, website name, film name).
+You do not need to give paragraph numbers or page numbers based on your Web browser’s print preview function.
+Unless you must list the Web site name in the signal phrase in order to get the reader to the appropriate entry, do not include URLs in-text. Only provide partial URLs such as when the name of the site includes, for example, a domain name, like CNN.com or Forbes.com as opposed to writing out http://www.cnn.com or http://www.forbes.com.
+Miscellaneous non-print sources
+
+Werner Herzog's Fitzcarraldo stars Herzog's long-time film partner, Klaus Kinski. During the shooting of Fitzcarraldo, Herzog and Kinski were often at odds, but their explosive relationship fostered a memorable and influential film.
+During the presentation, Jane Yates stated that invention and pre-writing are areas of rhetoric that need more attention.
+In the two examples above “Herzog” from the first entry and “Yates” from the second lead the reader to the first item each citation’s respective entry on the Works Cited page:
+
+Herzog, Werner, dir. Fitzcarraldo. Perf. Klaus Kinski. Filmverlag der Autoren, 1982. Film.
+Yates, Jane. "Invention in Rhetoric and Composition." Gaps Addressed: Future Work in Rhetoric and Composition, CCCC, Palmer House Hilton, 2002. Presentation.
+Electronic sources
+
+One online film critic stated that Fitzcarraldo is "...a beautiful and terrifying critique of obsession and colonialism" (Garcia, “Herzog: a Life”).
+The Purdue OWL is accessed by millions of users every year. Its "MLA Formatting and Style Guide" is one of the most popular resources (Stolley et al.).
+In the first example, the writer has chosen not to include the author name in-text; however, two entries from the same author appear in the Works Cited. Thus, the writer includes both the author’s last name and the article title in the parenthetical citation in order to lead the reader to the appropriate entry on the Works Cited page (see below). In the second example, “Stolley et al.” in the parenthetical citation gives the reader an author name followed by the abbreviation “et al.,” meaning, “and others,” for the article “MLA Formatting and Style Guide.” Both corresponding Works Cited entries are as follows:
+
+Garcia, Elizabeth. "Herzog: a Life." Online Film Critics Corner. The Film School of New Hampshire, 2 May 2002. Web. 8 Jan. 2009.
+Stolley, Karl, et al. "MLA Formatting and Style Guide." The OWL at Purdue. 10 May 2006. Purdue University Writing Lab. 12 May 2006.
+Multiple citations
+
+To cite multiple sources in the same parenthetical reference, separate the citations by a semi-colon:
+
+. . . as has been discussed elsewhere (Burke 3; Dewey 21).
+When a citation is not needed
+
+Common sense and ethics should determine your need for documenting sources. You do not need to give sources for familiar proverbs, well-known quotations or common knowledge. Remember, this is a rhetorical choice, based on audience. If you're writing for an expert audience of a scholarly journal, for example, they'll have different expectations of what constitutes common knowledge.
