@@ -514,9 +514,10 @@ public class Peer implements Runnable {
                         //@TODO fetch piece from file
                         Message piece_msg = new Message("piece");
                         piece_msg.setPayload(Util.intToByteArray(pieceNumber));
-                        System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "SERVER: " + id + " sending piece " + pieceNumber + " to clientId: " + clientId + " received unexpected messageType: " + msg.getType());
+                        System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "SERVER: " + id + " sending piece " + pieceNumber + " to clientId: " + clientId);
                         util.sendMessage(out, piece_msg);
-                    } else {
+                        piecesSentMap.put(clientId, pieceNumber);
+                    }else{
                         //TODO handle this
                         System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "SERVER: " + id + " inside RequestHandler clientId: " + clientId + " received unexpected messageType: " + msg.getType());
                         break;
@@ -540,7 +541,12 @@ public class Peer implements Runnable {
             return "status: " + status;
         }
 
-        private int optUnchoke() {
+        private int optUnchoke(){
+            long startTime = System.currentTimeMillis();
+
+            /*while(System.currentTimeMillis() - startTime < m){
+
+            }*/
             return 0;
         }
     }
@@ -552,8 +558,10 @@ public class Peer implements Runnable {
         List<Integer> prefNeis = new ArrayList<>();
         if (bitfieldsMap.get(id).cardinality() == noOfPieces) {
             //random select
-            for (Integer nei : interestedPeers) {
-                if (count == K) break;
+            List<Integer> interestedPeersList = new ArrayList<>(interestedPeers);
+            Collections.shuffle(interestedPeersList);
+            for(Integer nei: interestedPeersList){
+                if(count == K) break;
                 prefNeis.add(nei);
                 count++;
             }
