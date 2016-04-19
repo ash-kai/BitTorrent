@@ -1,10 +1,7 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 /**
  * Created by sunito on 4/17/16.
@@ -38,6 +35,9 @@ public class Peer implements Runnable {
     private Map<Integer, Socket> clientConnections; //used by client
     private Map<Integer, Socket> serverConnections;  //used by server
 
+    private Set<Integer> requestedPieces; //used by client to send new request msg
+    private Map<Integer, Integer> piecesSentMap; //used by server to calc download rate - refresh it every p seconds
+
     public Peer(int id) throws IOException {
         config = new Configuration("Common.cfg", "PeerInfo.cfg");
 
@@ -61,6 +61,8 @@ public class Peer implements Runnable {
 
         clientConnections = new HashMap<>();
         serverConnections = new HashMap<>();
+
+        piecesSentMap = new HashMap<>();
     }
 
     @Override
@@ -122,12 +124,22 @@ public class Peer implements Runnable {
             e.printStackTrace();
         }
 
+        ExecutorService unchokeService = Executors.newFixedThreadPool(1);
+        unchokeService.submit(new Unchoke());
 
+        ExecutorService optUnchokeService = Executors.newFixedThreadPool(1);
+        optUnchokeService.submit(new OptUnchoke());
+
+        optUnchokeService.shutdown();
+        unchokeService.shutdown();
         clientExecutorService.shutdown();
         serverExecutorService.shutdown();
         try{
-            Thread.sleep(5000);
-            closeAll();
+            //Thread.sleep(15000);
+            //closeAll();
+            while(true){
+
+            }
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -357,6 +369,162 @@ public class Peer implements Runnable {
         if(socket!=null && !socket.isClosed()) socket.getInputStream().close();
         if(socket!=null && !socket.isClosed()) socket.getOutputStream().close();
         if(socket!=null && !socket.isClosed()) socket.close();
+    }
+
+    public class Unchoke implements Callable<String>{
+
+        @Override
+        public String call(){
+            int status = 0;
+            try{
+                status = unchoke();
+            }catch(Exception e){
+                e.printStackTrace();
+                status = -1;
+            }
+            return "status: " + status;
+        }
+
+        private int unchoke() throws Exception{
+            long startTime = System.currentTimeMillis();
+            Util util = new Util();
+            int round = 1;
+            System.out.println("SERVER: " + id + " inside unchoke()");
+
+            while(round <= 10){ //@TODO check
+
+                if(System.currentTimeMillis() - startTime > p*1000){
+                    System.out.println("SERVER: " + id + " unchoke round: " + round);
+                    startTime = System.currentTimeMillis();
+                    ExecutorService requestService = Executors.newFixedThreadPool(K);
+                    List<Integer> prefNeis = getPreferredClients();
+                    System.out.println("SERVER: " + id + " prefNeis size: " + prefNeis.size());
+                    /*
+                        clear data structures; to populate new data
+                     */
+                    piecesSentMap = new HashMap<>();
+
+                    for(Integer nei: peerids){
+                        if(nei == id) continue;
+                        if(prefNeis.contains(nei) && !unchokedPeers.contains(nei)){
+                            Message unchoke_msg = new Message("unchoke");
+                            System.out.println("SERVER: " + id + " send unchoke to pref nei: " + nei);
+                            util.sendMessage(serverConnections.get(nei).getOutputStream(), unchoke_msg);
+                            requestService.submit(new RequestHandler(nei, p));
+                        }else if(!prefNeis.contains(nei) && serverConnections.containsKey(nei)){
+                            Message choke_msg = new Message("choke");
+                            System.out.println("SERVER: " + id + " send choke to nei: " + nei);
+                            util.sendMessage(serverConnections.get(nei).getOutputStream(), choke_msg);
+                        }
+                    }
+                    requestService.shutdown();
+                    round++;
+                }
+
+
+            }
+            return 0;
+        }
+
+    }
+
+    public class RequestHandler implements Callable<String>{
+
+        private int serverId;
+        private int clientId;
+        private int time; //in seconds
+
+        RequestHandler(int clientId, int time){
+            this.serverId = id;
+            this.clientId = clientId;
+            this.time = time;
+        }
+
+        @Override
+        public String call(){
+            int status = 0;
+            return "status: " + status;
+        }
+    }
+
+    public class OptUnchoke implements Callable<String>{
+
+        @Override
+        public String call(){
+            int status = optUnchoke();
+            return "status: " + status;
+        }
+
+        private int optUnchoke(){
+            return 0;
+        }
+    }
+
+    //select preferredNeis based on prev rounds download rate
+    // or random select if server has full file
+    public List<Integer> getPreferredClients(){
+        int count = 0;
+        List<Integer> prefNeis = new ArrayList<>();
+        if(bitfieldsMap.get(id).cardinality()==noOfPieces){
+            //random select
+            for(Integer nei: interestedPeers){
+                if(count == K) break;
+                prefNeis.add(nei);
+                count++;
+            }
+            return prefNeis;
+        }
+        List<Integer> sortedNeis = sortByDownloadRate();
+        for(int i=sortedNeis.size()-1; i>=0; i--){
+            if(count==K) break;
+            prefNeis.add(sortedNeis.get(i));
+        }
+        return prefNeis;
+    }
+
+    public List<Integer> sortByDownloadRate(){
+        List<Integer> neis = new ArrayList<>();
+
+        class Pair{
+            int neiId;
+            int freq;
+
+            Pair(int neiId, int freq){
+                this.neiId = neiId;
+                this.freq = freq;
+            }
+
+            @Override
+            public int hashCode(){
+                return neiId*31 + 17*freq;
+            }
+
+            @Override
+            public boolean equals(Object obj){
+                if(!(obj instanceof Pair)) return false;
+                if(this == obj) return true;
+                Pair other = (Pair) obj;
+                return this.neiId == other.neiId && this.freq == other.freq;
+            }
+        }
+
+        List<Pair> pairs = new ArrayList<>();
+        for(Map.Entry<Integer, Integer> entry: piecesSentMap.entrySet()){
+            pairs.add(new Pair(entry.getKey(), entry.getValue()));
+        }
+
+        Collections.sort(pairs, new Comparator<Pair>() {
+            @Override
+            public int compare(Pair p1, Pair p2) {
+                return p1.freq - p2.freq;
+            }
+        });
+
+
+        for(Pair p: pairs)
+            neis.add(p.neiId);
+
+        return neis;
     }
 }
 
