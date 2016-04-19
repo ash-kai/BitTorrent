@@ -48,7 +48,6 @@ public class FileHandle {
     }
 
     public void CopyFile(File source) throws IOException {
-        System.out.println("Was called Copy File");
         InputStream input = null;
         OutputStream output = null;
         try {

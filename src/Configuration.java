@@ -97,6 +97,7 @@ public class Configuration {
                 segments = scan.nextLine().split(" ");
                 pieceSize = Integer.parseInt(segments[1].trim());
                 this.totalNumOfPieces = fileSize / pieceSize;
+                System.out.println("Configuration  : The total number of chunks are: "+this.totalNumOfPieces);
             } finally {
                 scan.close();
                 fileReader.close();
