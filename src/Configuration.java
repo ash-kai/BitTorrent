@@ -15,6 +15,7 @@ public class Configuration {
     private String fileName;
     private int fileSize;
     private int pieceSize;
+    private int lastPieceSize;
 
 
     private int totalNumOfPieces;
@@ -49,6 +50,10 @@ public class Configuration {
 
     public int getPieceSize() {
         return pieceSize;
+    }
+
+    public int getLastPieceSize() {
+        return lastPieceSize;
     }
 
     public int getTotalNumOfPieces() {
@@ -96,8 +101,9 @@ public class Configuration {
                 fileSize = Integer.parseInt(segments[1].trim());
                 segments = scan.nextLine().split(" ");
                 pieceSize = Integer.parseInt(segments[1].trim());
-                this.totalNumOfPieces = fileSize / pieceSize;
-                System.out.println("Configuration  : The total number of chunks are: "+this.totalNumOfPieces);
+                this.totalNumOfPieces = (int) Math.ceil((double) fileSize / pieceSize);
+                this.lastPieceSize = fileSize % pieceSize;
+                System.out.println("##### Configuration  : The total number of chunks are: " + this.totalNumOfPieces);
             } finally {
                 scan.close();
                 fileReader.close();

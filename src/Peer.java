@@ -268,7 +268,7 @@ public class Peer implements Runnable {
                         System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "SERVER: " + id + " received request for piece " + pieceNumber + " from clientId: " + clientId);
                         //@TODO fetch piece from file
                         Message piece_msg = new Message("piece");
-                        piece_msg.setPayload(Util.intToByteArray(pieceNumber));
+                        piece_msg.setPayload(fileHandle.readFromFile(pieceNumber));
                         System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "SERVER: " + id + " sending piece " + pieceNumber + " to clientId: " + clientId);
                         util.sendMessage(out, piece_msg);
                         piecesSentMap.put(clientId, pieceNumber);
@@ -481,7 +481,7 @@ public class Peer implements Runnable {
                                 }
                             }
                             else if (msg.getType() == 7) { //piece
-                                int pnum = Util.byteToIntArray(msg.getPayload());
+                                int pnum = fileHandle.writeToFile(msg.getPayload());
                                 System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "CLIENT: " + id + " received pieceNumber: " + pnum);
 
                                 Thread.sleep(500); //@TODO check - receive and write piece to file
