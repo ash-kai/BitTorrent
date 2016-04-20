@@ -14,13 +14,13 @@ public class Util {
     public synchronized void sendMessage(OutputStream out, Message msg) throws IOException {
         System.out.println("Send Message " + sdf.format(Calendar.getInstance().getTime()));
         if (msg.getPayload() == null) {
-            System.out.println(sdf.format(Calendar.getInstance().getTime()) + " The payload is null");
+            //System.out.println(sdf.format(Calendar.getInstance().getTime()) + " The payload is null");
             msg.setLength(1);
         } else {
             msg.setLength(msg.getPayload().length + 1);
         }
         out.write(intToByteArray(msg.getLength()));
-        System.out.println(sdf.format(Calendar.getInstance().getTime()) + " in sendMessage: length: " + msg.getLength() + " & Message Type " + msg.getType());
+        //System.out.println(sdf.format(Calendar.getInstance().getTime()) + " in sendMessage: length: " + msg.getLength() + " & Message Type " + msg.getType());
         out.write(msg.getType());
 
 
@@ -32,7 +32,6 @@ public class Util {
 
     public synchronized Message receiveMessage(InputStream in) throws IOException {
         Message msg = new Message(null);
-        System.out.println(sdf.format(Calendar.getInstance().getTime()) + "Inside receiveMessage()");
         int totalRead = 0, received = 0;
 
         //Read the length section of message
@@ -47,22 +46,9 @@ public class Util {
         totalRead = 0;
         byte[] mType = new byte[1];
         int len = msg.getLength();
-        if (len > 1000) {
-            System.out.println(sdf.format(Calendar.getInstance().getTime()) + " ERROR byte array: " + Arrays.toString(lengthInByte));
-            System.out.println(sdf.format(Calendar.getInstance().getTime()) + " ERROR IN LENGTH len: " + len); //TODO debug this!!
-            //msg.setType((byte) 50);
-            //return null;
-        }
-        System.out.println(sdf.format(Calendar.getInstance().getTime()) + " len: " + msg.getLength() + " totalRead: " + totalRead);
         while (totalRead < 1) {
-            if(len > 1000){
-                System.out.println(Calendar.getInstance().getTime() +  "mtype before ERROR received == 0");
-            }
             received = in.read(mType, totalRead, 1 - totalRead);
             totalRead += received;
-            if(len > 1000){
-                System.out.println(Calendar.getInstance().getTime() +  "mtype after ERROR received == 0");
-            }
         }
         msg.setType(mType[0]);
         //Read the remaining payload
@@ -74,18 +60,10 @@ public class Util {
         }
         totalRead = 0;
         while (totalRead < msg.getLength() - 1) {
-            if(len > 1000){
-                System.out.println(Calendar.getInstance().getTime() +  "mPayload before ERROR received == 0");
-            }
             received = in.read(mPayload, totalRead, msg.getLength() - 1 - totalRead);
             totalRead += received;
-            if(len > 1000){
-                System.out.println(Calendar.getInstance().getTime() +  "mPayload after ERROR received == 0");
-            }
         }
         msg.setPayload(mPayload);
-        if(len > 1000)
-            System.out.println(Calendar.getInstance().getTime() + " ReceivedFullMessage");
         return msg;
     }
 
