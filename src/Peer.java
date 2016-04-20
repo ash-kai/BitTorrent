@@ -59,24 +59,24 @@ public class Peer implements Runnable {
         fileHandle = new FileHandle(this.config, this.id);
 
         peerids = new int[N];
-        bitfieldsMap = new HashMap<>();
-        handShakeMap = new HashMap<>();
+        bitfieldsMap = Collections.synchronizedMap(new HashMap<>());
+        handShakeMap = Collections.synchronizedMap(new HashMap<>());
 
         peerLog = new P2PLogger(this.id);
 
-        interestedPeers = new HashSet<>();
-        unchokedPeers = new HashSet<>();
-        chokedPeers = new HashSet<>();
+        interestedPeers = Collections.synchronizedSet(new HashSet<>());
+        unchokedPeers = Collections.synchronizedSet(new HashSet<>());
+        chokedPeers = Collections.synchronizedSet(new HashSet<>());
 
-        clientConnections = new HashMap<>();
-        serverConnections = new HashMap<>();
+        clientConnections = Collections.synchronizedMap(new HashMap<>());
+        serverConnections = Collections.synchronizedMap(new HashMap<>());
 
-        requestedPieces = new HashSet<>();
-        piecesSentMap = new HashMap<>();
+        requestedPieces = Collections.synchronizedSet(new HashSet<>());
+        piecesSentMap = Collections.synchronizedMap(new HashMap<>());
 
         stopCount = 0;
-        stopSentServers = new HashSet<>();
-        stopReceivedFromClients = new HashSet<>();
+        stopSentServers = Collections.synchronizedSet(new HashSet<>());
+        stopReceivedFromClients = Collections.synchronizedSet(new HashSet<>());
 
         optSelect = -1;
     }
@@ -259,7 +259,7 @@ public class Peer implements Runnable {
                 }
 
                 //keep listening to messages from client until we receive stop
-                while(true){
+                while(stopReceivedFromClients.size() < serverConnections.size()){
 
                     msg = util.receiveMessage(in);
 
@@ -307,6 +307,7 @@ public class Peer implements Runnable {
                 e.printStackTrace();
                 return 0;
             }
+            return 1;
         }
     }
 
