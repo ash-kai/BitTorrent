@@ -257,6 +257,31 @@ public class Peer implements Runnable {
                     System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "SERVER: " + id + " should not happend: server is expectiing bitfield/interested/notinterested but found this msgtype: " + msg.getType() + " from client: " + clientId);
                 }
 
+                //keep listening to messages from client until we receive stop
+                while(true){
+
+                    msg = util.receiveMessage(in);
+
+                    if(msg.getType()==6){ //request
+                        int pieceNumber = Util.byteToIntArray(msg.getPayload());
+                        System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "SERVER: " + id + " received request for piece " + pieceNumber + " from clientId: " + clientId);
+                        //@TODO fetch piece from file
+                        Message piece_msg = new Message("piece");
+                        piece_msg.setPayload(Util.intToByteArray(pieceNumber));
+                        System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "SERVER: " + id + " sending piece " + pieceNumber + " to clientId: " + clientId);
+                        util.sendMessage(out, piece_msg);
+                        piecesSentMap.put(clientId, pieceNumber);
+                    }else if(msg.getType()==8){ //stop
+                        System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "SERVER: " + id + " received STOP request from clientId: " + clientId);
+                        break;
+                    }else{ //unexpected message
+                        System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "SERVER: " + id + " received inside server_communication() UNEXPECTED MSG from clientId: " + clientId);
+                    }
+
+                }
+
+
+
             } catch (Exception e) {
                 e.printStackTrace();
                 return 0;
@@ -369,30 +394,47 @@ public class Peer implements Runnable {
                     msg = util.receiveMessage(in);
 
                     if (msg.getType() == 1) { //unchoke
-                        System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "CLIENT: " + id + " received unchoke message from server: " + serverId);
-                        int pieceNumber = util.getRandomInterestingPieceNotIn(bitfieldsMap.get(id), bitfieldsMap.get(serverId), requestedPieces);
-                        Message request_msg = new Message("request");
-                        request_msg.setPayload(Util.intToByteArray(pieceNumber));
-                        System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "CLIENT: " + id + " requesting pieceNumber: " + pieceNumber + " from server: " + serverId);
-                        util.sendMessage(out, request_msg);
 
-                        msg = util.receiveMessage(in);
-                        if (msg.getType() == 7) { //piece
-                            int pnum = Util.byteToIntArray(msg.getPayload());
-                            System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "CLIENT: " + id + " received pieceNumber: " + pnum);
+                        while(msg.getType() != 0) { //until we receive choked
 
-                            Thread.sleep(500); //@TODO check - receive and write piece to file
-                            bitfieldsMap.get(id).set(pnum);
-                            requestedPieces.remove(pnum);
-                            //@TODO send have message to all clients
+                            System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "CLIENT: " + id + " received unchoke message from server: " + serverId);
+                            int pieceNumber = util.getRandomInterestingPieceNotIn(bitfieldsMap.get(id), bitfieldsMap.get(serverId), requestedPieces);
+                            Message request_msg = new Message("request");
+                            request_msg.setPayload(Util.intToByteArray(pieceNumber));
+                            System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "CLIENT: " + id + " requesting pieceNumber: " + pieceNumber + " from server: " + serverId);
+                            util.sendMessage(out, request_msg);
+
+                            msg = util.receiveMessage(in);
+                            if(msg.getType() == 0){
+                                break; //choked
+                            }
+                            if (msg.getType() == 7) { //piece
+                                int pnum = Util.byteToIntArray(msg.getPayload());
+                                System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "CLIENT: " + id + " received pieceNumber: " + pnum);
+
+                                Thread.sleep(500); //@TODO check - receive and write piece to file
+                                bitfieldsMap.get(id).set(pnum);
+                                requestedPieces.remove(pnum);
+                                System.out.println(Calendar.getInstance().getTime() + " - " + "CLIENT: " + id + " bitset: " + bitfieldsMap.get(id).toString());
+                                //@TODO send have message to all clients
+                            }else{
+                                System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "CLIENT: " + id + " received UNEXPECTED MSG from server: " + serverId);
+                            }
+                            msg = util.receiveMessage(in);
+                        }
+                        if (msg.getType() == 0) { //choke
+                            System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "CLIENT: " + id + " received choke from server: " + serverId);
+                            continue;
                         }
                     }
+                }
 
-                    if (msg.getType() == 0) { //choke
-                        System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "CLIENT: " + id + " received choke from server: " + serverId);
-                        continue;
-                    }
+                System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "CLIENT: " + id + " received FULL FILE from server: " + serverId);
 
+                // send stop message
+                if(bitfieldsMap.get(id).cardinality() == noOfPieces){
+                    Message stop_msg = new Message("stop");
+                    util.sendMessage(out, stop_msg);
                 }
 
 
@@ -441,13 +483,14 @@ public class Peer implements Runnable {
 
         private int unchoke() throws Exception {
             long startTime = System.currentTimeMillis();
-            Util util = new Util();
+
             int round = 1;
             System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "SERVER: " + id + " inside unchoke()");
 
-            while (round <= 15) { //@TODO check
+            while (round <= 25) { //@TODO check
 
                 if (System.currentTimeMillis() - startTime > p * 1000) {
+                    Util util = new Util();
                     System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "SERVER: " + id + " unchoke round: " + round);
                     startTime = System.currentTimeMillis();
                     ExecutorService requestService = Executors.newFixedThreadPool(K);
@@ -464,7 +507,7 @@ public class Peer implements Runnable {
                             Message unchoke_msg = new Message("unchoke");
                             System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "SERVER: " + id + " send unchoke to pref nei: " + nei);
                             util.sendMessage(serverConnections.get(nei).getOutputStream(), unchoke_msg);
-                            requestService.submit(new RequestHandler(nei, p));
+                            //requestService.submit(new RequestHandler(nei, p));
                             unchokedPeers.add(nei);
                         } else if (!prefNeis.contains(nei) && serverConnections.containsKey(nei)) {
                             Message choke_msg = new Message("choke");
@@ -505,9 +548,10 @@ public class Peer implements Runnable {
                 InputStream in = socket.getInputStream();
                 OutputStream out = socket.getOutputStream();
 
-                while (System.currentTimeMillis() - startTime < runtime) {
+                while (System.currentTimeMillis() - startTime < runtime*1000) {
 
                     Util util = new Util();
+                    System.out.println(Calendar.getInstance().getTime() + " - " + "SERVER: " + id + " client: " + clientId);
                     Message msg = util.receiveMessage(in);
 
                     if (msg.getType() == 6) { //request
@@ -518,7 +562,7 @@ public class Peer implements Runnable {
                         System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "SERVER: " + id + " sending piece " + pieceNumber + " to clientId: " + clientId);
                         util.sendMessage(out, piece_msg);
                         piecesSentMap.put(clientId, pieceNumber);
-                    }else{
+                    } else {
                         //TODO handle this
                         System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "SERVER: " + id + " inside RequestHandler clientId: " + clientId + " received unexpected messageType: " + msg.getType());
                         break;
@@ -542,7 +586,7 @@ public class Peer implements Runnable {
             return "status: " + status;
         }
 
-        private int optUnchoke(){
+        private int optUnchoke() {
             long startTime = System.currentTimeMillis();
 
             /*while(System.currentTimeMillis() - startTime < m){
@@ -561,8 +605,8 @@ public class Peer implements Runnable {
             //random select
             List<Integer> interestedPeersList = new ArrayList<>(interestedPeers);
             Collections.shuffle(interestedPeersList);
-            for(Integer nei: interestedPeersList){
-                if(count == K) break;
+            for (Integer nei : interestedPeersList) {
+                if (count == K) break;
                 prefNeis.add(nei);
                 count++;
             }

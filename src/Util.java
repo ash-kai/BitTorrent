@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -8,15 +9,18 @@ import java.util.*;
  */
 public class Util {
 
-    public synchronized void sendMessage(OutputStream out, Message msg) throws IOException {
+    SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 
+    public synchronized void sendMessage(OutputStream out, Message msg) throws IOException {
+        System.out.println("Send Message " + sdf.format(Calendar.getInstance().getTime()));
         if (msg.getPayload() == null) {
+            System.out.println(sdf.format(Calendar.getInstance().getTime()) + " The payload is null");
             msg.setLength(1);
         } else {
             msg.setLength(msg.getPayload().length + 1);
         }
         out.write(intToByteArray(msg.getLength()));
-        System.out.println("in sendMessage: len of msg type: " + msg.getType());
+        System.out.println(sdf.format(Calendar.getInstance().getTime()) + " in sendMessage: length: " + msg.getLength() + " & Message Type " + msg.getType());
         out.write(msg.getType());
 
 
@@ -28,7 +32,7 @@ public class Util {
 
     public synchronized Message receiveMessage(InputStream in) throws IOException {
         Message msg = new Message(null);
-
+        System.out.println(sdf.format(Calendar.getInstance().getTime()) + "Inside receiveMessage()");
         int totalRead = 0, received = 0;
 
         //Read the length section of message
@@ -42,14 +46,23 @@ public class Util {
         //Read the type section of message
         totalRead = 0;
         byte[] mType = new byte[1];
-        int len = byteToIntArray(lengthInByte);
-        if(len > 300){
-            System.out.println("ERROR IN LENGTH len: " + len); //TODO debug this!!
+        int len = msg.getLength();
+        if (len > 1000) {
+            System.out.println(sdf.format(Calendar.getInstance().getTime()) + " ERROR byte array: " + Arrays.toString(lengthInByte));
+            System.out.println(sdf.format(Calendar.getInstance().getTime()) + " ERROR IN LENGTH len: " + len); //TODO debug this!!
+            //msg.setType((byte) 50);
+            //return null;
         }
-        System.out.println("len: " + byteToIntArray(lengthInByte) + " totalRead: " + totalRead);
+        System.out.println(sdf.format(Calendar.getInstance().getTime()) + " len: " + msg.getLength() + " totalRead: " + totalRead);
         while (totalRead < 1) {
+            if(len > 1000){
+                System.out.println(Calendar.getInstance().getTime() +  "mtype before ERROR received == 0");
+            }
             received = in.read(mType, totalRead, 1 - totalRead);
             totalRead += received;
+            if(len > 1000){
+                System.out.println(Calendar.getInstance().getTime() +  "mtype after ERROR received == 0");
+            }
         }
         msg.setType(mType[0]);
         //Read the remaining payload
@@ -61,10 +74,18 @@ public class Util {
         }
         totalRead = 0;
         while (totalRead < msg.getLength() - 1) {
+            if(len > 1000){
+                System.out.println(Calendar.getInstance().getTime() +  "mPayload before ERROR received == 0");
+            }
             received = in.read(mPayload, totalRead, msg.getLength() - 1 - totalRead);
             totalRead += received;
+            if(len > 1000){
+                System.out.println(Calendar.getInstance().getTime() +  "mPayload after ERROR received == 0");
+            }
         }
         msg.setPayload(mPayload);
+        if(len > 1000)
+            System.out.println(Calendar.getInstance().getTime() + " ReceivedFullMessage");
         return msg;
     }
 
@@ -89,28 +110,28 @@ public class Util {
         return result;
     }
 
-    public int getRandomInterestingPiece(BitSet me, BitSet other){
+    public int getRandomInterestingPiece(BitSet me, BitSet other) {
         return getRandomInterestingPieceNotIn(me, other, new HashSet<>());
     }
 
-    public int getRandomInterestingPieceNotIn(BitSet me, BitSet other, Set<Integer> requested){
+    public int getRandomInterestingPieceNotIn(BitSet me, BitSet other, Set<Integer> requested) {
         List<Integer> interestingIndices = getInterestingIndices(me, other);
-        if(interestingIndices.size() == 0) return -1;
+        if (interestingIndices.size() == 0) return -1;
         Random random = new Random();
         int rnd = -1;
-        while(true){
+        while (true) {
             rnd = random.nextInt(interestingIndices.size());
-            if(!requested.contains(rnd))
+            if (!requested.contains(rnd))
                 break;
         }
         System.out.println("rnd: " + rnd);
         return interestingIndices.get(rnd);
     }
 
-    public List<Integer> getInterestingIndices(BitSet me, BitSet other){
+    public List<Integer> getInterestingIndices(BitSet me, BitSet other) {
         List<Integer> interestingIndices = new ArrayList<Integer>();
         for (int i = other.nextSetBit(0); i != -1; i = other.nextSetBit(i + 1)) {
-            if(!me.get(i))
+            if (!me.get(i))
                 interestingIndices.add(i);
         }
 //        System.out.println("inside getInterestingIndices");

@@ -77,6 +77,9 @@ public class Message {
             case "piece":
                 setType((byte) 7);
                 break;
+            case "stop":
+                setType((byte) 8);
+                break;
         }
     }
 
