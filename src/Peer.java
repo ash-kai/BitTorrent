@@ -206,7 +206,7 @@ public class Peer implements Runnable {
 
                 serverConnections.put(clientId, socket);
 
-                System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "SERVER: " + id + " received handshake request from clientId: " + clientId + " stopCount: " + stopCount + " initial totalStopsNeeded: " + serverConnections.keySet().size());
+                System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "SERVER: " + id + " received handshake request from clientId: " + clientId + " stopReceivedFromClient.size(): " + stopReceivedFromClients.size() + " initial totalStopsNeeded: " + serverConnections.keySet().size());
 
                 /*
                     2. receive bitfield from client
@@ -278,7 +278,7 @@ public class Peer implements Runnable {
                         //    util.sendMessage(serverConnections.get(clientId).getOutputStream(), stop_msg);
                         stopCount++;
                         stopReceivedFromClients.add(clientId);
-                        System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "SERVER: " + id + " received STOP request from clientId: " + clientId + " stopCount: " + stopCount + " totalStopsNeeded: " + serverConnections.size());
+                        System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "SERVER: " + id + " received STOP request from clientId: " + clientId + " stopReceivedFromClient.size(): " + stopReceivedFromClients.size() + " totalStopsNeeded: " + serverConnections.size());
                         if(stopReceivedFromClients.size()==serverConnections.size()) {//if(stopCount == serverConnections.size()) {
                             System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "SERVER: " + id + " received STOP from all children --SAFE STOP");
                             return 1;
@@ -612,7 +612,7 @@ public class Peer implements Runnable {
                     }
 
                     Util util = new Util();
-                    System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "SERVER: " + id + " unchoke round: " + round + " stopCount: " + stopCount);
+                    System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "SERVER: " + id + " unchoke round: " + round + " stopReceivedFromClient.size(): " + stopReceivedFromClients.size());
                     startTime = System.currentTimeMillis();
                     ExecutorService requestService = Executors.newFixedThreadPool(K);
                     List<Integer> prefNeis = getPreferredClients();
@@ -704,7 +704,7 @@ public class Peer implements Runnable {
                             try{
                                 util.sendMessage(serverConnections.get(optSel).getOutputStream(), unchoke_msg);
                             }catch(Exception e){
-                                System.out.println("May not be able to unchoke!! as the peer might be turned off for example 1004!!");
+                                System.out.println("May not be able to unchoke!! as the peer might be turned off for example 1004!! stopReceivedFromClient.size(): " + stopReceivedFromClients.size());
                                 stopCount++;
                                 stopReceivedFromClients.add(optSel);
                                 continue;
