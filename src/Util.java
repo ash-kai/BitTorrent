@@ -34,6 +34,8 @@ public class Util {
         Message msg = new Message(null);
         int totalRead = 0, received = 0;
 
+        System.out.println(sdf.format(Calendar.getInstance().getTime()) + " inside receiveMessage()");
+
         //Read the length section of message
         byte[] lengthInByte = new byte[4];
         while (totalRead < 4) {
