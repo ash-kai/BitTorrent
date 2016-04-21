@@ -488,8 +488,14 @@ public class Peer implements Runnable {
                                 //Thread.sleep(500); //@TODO check - receive and write piece to file
                                 bitfieldsMap.get(id).set(pnum);
                                 requestedPieces.remove(pnum);
-                                System.out.println(Calendar.getInstance().getTime() + " - " + "CLIENT: " + id + " bitset: " + bitfieldsMap.get(id).toString());
+//                                System.out.println(Calendar.getInstance().getTime() + " - " + "CLIENT: " + id + " bitset: " + bitfieldsMap.get(id).toString());
                                 peerLog.logDownloadedPiece(serverId, Calendar.getInstance(), pnum, bitfieldsMap.get(id).cardinality());
+
+                                if (!stop && bitfieldsMap.get(id).cardinality() == noOfPieces) {
+                                    peerLog.logComleteFileDownloaded(Calendar.getInstance());
+                                    peerLog.OffLogger();
+                                }
+
                                 //@TODO send have message to all clients
                                 for (Map.Entry<Integer, Socket> entry : serverConnections.entrySet()) {
                                     Message have_msg = new Message("have");
@@ -534,7 +540,6 @@ public class Peer implements Runnable {
                         }
                     }
                 }
-                peerLog.logComleteFileDownloaded(Calendar.getInstance());
                 //  System.out.println(sdf.format(Calendar.getInstance().getTime()) + " - " + "CLIENT: " + id + " received FULL FILE from server: " + serverId);
 
                 // send stop message
@@ -642,7 +647,7 @@ public class Peer implements Runnable {
                             try {
                                 util.sendMessage(serverConnections.get(nei).getOutputStream(), unchoke_msg);
                             } catch (Exception e) {
-                                System.out.println("KNOWN issue: inside unchoke() client may be closed already like 1004!!");
+                                System.out.println("KNOWN issue: inside unchoke() client may be closed!! Client " + nei);
                                 stopCount++;
                                 stopReceivedFromClients.add(nei);
                                 continue;

@@ -57,7 +57,6 @@ public class FileHandle {
             file.writeByte(data[noOfBytesWritten]);
             noOfBytesWritten += 1;
         }
-        System.out.println("%%%%% Files Write Operation %%%%%" + file.length());
         return index;
     }
 

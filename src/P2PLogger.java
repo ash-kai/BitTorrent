@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.FileHandler;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
@@ -33,6 +34,10 @@ public class P2PLogger {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void OffLogger(){
+        logger.setLevel(Level.OFF);
     }
 
     public void logTcpConnection(int peerId, Calendar currentTime) {
