@@ -494,6 +494,20 @@ public class Peer implements Runnable {
                                 if (!stop && bitfieldsMap.get(id).cardinality() == noOfPieces) {
                                     peerLog.logComleteFileDownloaded(Calendar.getInstance());
                                     peerLog.OffLogger();
+				//send stop message to all serverIds
+                    for (Map.Entry<Integer, Socket> entry : clientConnections.entrySet()) {
+                        Message stop_msg = new Message("stop");
+                        try {
+                            if (!stopSentServers.contains(entry.getKey())) {
+                                util.sendMessage(entry.getValue().getOutputStream(), stop_msg);
+                                stopSentServers.add(entry.getKey());
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            //System.out.println("KNOWN ERROR - IGNORE");
+                        }
+stop=true;
+                    }
                                 }
 
                                 //@TODO send have message to all clients
