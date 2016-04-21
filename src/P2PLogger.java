@@ -3,6 +3,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
@@ -42,8 +43,9 @@ public class P2PLogger {
         logger.info(dateFormatter.format(currentTime.getTime()) + " : Peer " + this.id + " is connected from Peer " + peerId);
     }
 
-    public void logChangePrefNeighbours(int[] neighbourPeers, Calendar currentTime) {
-        String neighbours = Arrays.toString(neighbourPeers);
+    public void logChangePrefNeighbours(List<Integer> neighbourPeers, Calendar currentTime) {
+        //String neighbours = Arrays.toString(neighbourPeers);
+        String neighbours = neighbourPeers.toString();
         logger.info(dateFormatter.format(currentTime.getTime()) + " : Peer " + this.id + " has the preferred neighbors " + neighbours);
     }
 
@@ -60,7 +62,7 @@ public class P2PLogger {
     }
 
     public void logHavePiece(int peerId, Calendar currentTime, int piece) {
-        logger.info(dateFormatter.format(currentTime.getTime()) + " : Peer " + this.id + " received the ‘have’ message from " + peerId + "for the piece " + piece);
+        logger.info(dateFormatter.format(currentTime.getTime()) + " : Peer " + this.id + " received the ‘have’ message from " + peerId + " for the piece " + piece);
     }
 
     public void logInterested(int peerId, Calendar currentTime) {

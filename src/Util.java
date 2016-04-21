@@ -12,7 +12,7 @@ public class Util {
     SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 
     public synchronized void sendMessage(OutputStream out, Message msg) throws IOException {
-        System.out.println("Send Message " + sdf.format(Calendar.getInstance().getTime()));
+        //System.out.println("Send Message " + sdf.format(Calendar.getInstance().getTime()));
         if (msg.getPayload() == null) {
             //System.out.println(sdf.format(Calendar.getInstance().getTime()) + " The payload is null");
             msg.setLength(1);
@@ -34,7 +34,7 @@ public class Util {
         Message msg = new Message(null);
         int totalRead = 0, received = 0;
 
-        System.out.println(sdf.format(Calendar.getInstance().getTime()) + " inside receiveMessage()");
+       // System.out.println(sdf.format(Calendar.getInstance().getTime()) + " inside receiveMessage()");
 
         //Read the length section of message
         byte[] lengthInByte = new byte[4];
