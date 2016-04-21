@@ -104,7 +104,6 @@ public class Util {
             if (!requested.contains(rnd))
                 break;
         }
-        System.out.println("rnd: " + rnd);
         return interestingIndices.get(rnd);
     }
 
